@@ -5,7 +5,7 @@ use Mojo::URL;
 use I18N::LangTags;
 use I18N::LangTags::Detect;
 
-our $VERSION = 0.81;
+our $VERSION = 0.82;
 
 # "Can we have Bender burgers again?
 #  No, the cat shelter’s onto me."
@@ -196,7 +196,7 @@ sub _load_module {
 			eval qq(require "$file.pm");
 		
 			my $default = $self->{default};
-			if ($@ || eval "\%${module}::Lexicon") {
+			if ($@ || not eval "\%${module}::Lexicon") {
 				if ($_ eq $default) {
 					DEBUG && warn("Create the I18N class $module");
 					
