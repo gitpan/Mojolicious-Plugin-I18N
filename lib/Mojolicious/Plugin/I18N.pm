@@ -5,7 +5,7 @@ use Mojo::URL;
 use I18N::LangTags;
 use I18N::LangTags::Detect;
 
-our $VERSION = 0.9;
+our $VERSION = '1.0';
 
 # "Can we have Bender burgers again?
 #  No, the cat shelter’s onto me."
@@ -15,6 +15,9 @@ sub register {
 	# Initialize
 	my $namespace = $conf->{namespace} || ( (ref $app) . '::I18N' );
 	my $default   = $conf->{default  } || 'en';
+	$default =~ tr/-A-Z/_a-z/;
+	$default =~ tr/_a-z0-9//cd;
+	
 	my $langs     = $conf->{support_url_langs};
 	my $hosts     = $conf->{support_hosts    };
 	
@@ -115,7 +118,7 @@ sub register {
 				last;                                                                                                                                                                                 
 			}   
 		}   
-
+		
 		if ($lang) {
 			my $str = $url->path;
 			my $new = "/$lang" . ($str eq '/' ? '' : $str);
@@ -240,6 +243,7 @@ Mojolicious::Plugin::I18N - Internationalization Plugin for Mojolicious 3.x and 
 =head1 DESCRIPTION
 
 L<Mojolicious::Plugin::I18N> is internationalization plugin for Mojolicious 3.x and higher.
+It works with Mojolicious 4.0+.
 
 Old namespace is L<Mojolicious::Plugin::I18N2>.
 
