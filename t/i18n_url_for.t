@@ -35,6 +35,7 @@ plugin 'I18N' => { namespace => 'App::I18N', default => 'ru', support_url_langs 
 
 get '/' => 'index';
 get '/auth' => 'auth';
+get '/test/:slug' => 'compat';
 
 post '/login' => sub {
   my $self = shift;
@@ -42,7 +43,7 @@ post '/login' => sub {
   # Do login things ;)
   # ...
   
-  return $self->redirect_to($self->param('next') || 'index');
+  $self->redirect_to($self->param('next') || 'index');
 };
 
 #
@@ -62,6 +63,21 @@ $t->get_ok('/de')->status_is(200)
   ->content_is("ПриветПривет дваru\n/de\n/de?test=1\n");
 
 $t->get_ok('/es')->status_is(404);
+
+$t->get_ok('/test/hello')->status_is(200)
+  ->content_is(
+	join "\n", qw(
+		/test/hello
+		/en/test/hello
+		/en/test/hello
+		/en/test/hello
+		/en/test/hello
+		/en/perldoc
+		//mojolicio.us/en/perldoc
+		http://mojolicio.us/perldoc
+	), ''
+  )
+;
 
 my $port = $t->tx->remote_port();
 
@@ -102,3 +118,13 @@ __DATA__
 
 @@ auth.html.ep
 <a href="http://example.com/widget?lang=<%= languages %>&token_url=<%= url_for('login')->query('next' => url_for 'auth')->to_abs() %>">auth</a>
+
+@@ compat.html.ep
+%= url_for
+%= url_for(slug => stash('slug'), lang => 'en')
+%= url_for({slug => stash('slug'), lang => 'en'})
+%= url_for('compat', slug => stash('slug'), lang => 'en')
+%= url_for('compat', {slug => stash('slug'), lang => 'en'})
+%= url_for('/perldoc', lang => 'en')
+%= url_for('//mojolicio.us/perldoc', lang => 'en')
+%= url_for('http://mojolicio.us/perldoc', lang => 'en')
